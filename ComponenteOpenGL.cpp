@@ -21,17 +21,49 @@ void ComponenteOpenGL::initializeGL()
 {
     initializeOpenGLFunctions();
 
-    float vertices[] {
-        /* -0.5f,  0.5f, 0.5f, 0.5f, 0.5f, */
-        /*  0.5f,  0.5f, 0.5f, 0.5f, 0.5f, */
-        /*  0.5f, -0.5f, 0.5f, 0.5f, 0.5f, */
-        /* -0.5f, -0.5f, 0.5f, 0.5f, 0.5f */
+    GLfloat vertices[] = {
+        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
 
-        -0.5f,  0.5f, 1.0f, 0.0f, 0.0f,
-         0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
-         0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 1.0f, 1.0f, 1.0f
-    };
+        -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+
+        -0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+
+         0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+
+        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
+
+        -0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f
+};
 
     GLuint ordem[]{
         0, 1, 2,
@@ -53,7 +85,7 @@ void ComponenteOpenGL::initializeGL()
 
     const char *codigo_vertex_shader = R"glsl(
         #version 130
-        in vec2 posicao;
+        in vec3 posicao;
         in vec3 cor_vertex;
         uniform mat4 transformacao; 
         uniform mat4 visualizacao; 
@@ -63,7 +95,7 @@ void ComponenteOpenGL::initializeGL()
 
         void main(){
             cor_fragment = cor_vertex; 
-            gl_Position = projecao * visualizacao * transformacao * vec4(posicao, 0.0f, 1.0f);
+            gl_Position = projecao * visualizacao * transformacao * vec4(posicao, 1.0f);
         }
     )glsl";
 
@@ -108,11 +140,11 @@ void ComponenteOpenGL::initializeGL()
 
     GLint indice_posicao = glGetAttribLocation(programa_shader, "posicao");
     glEnableVertexAttribArray(indice_posicao);
-    glVertexAttribPointer(indice_posicao, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
+    glVertexAttribPointer(indice_posicao, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
     
     GLint indice_cor = glGetAttribLocation(programa_shader, "cor_vertex");
     glEnableVertexAttribArray(indice_cor);
-    glVertexAttribPointer(indice_cor, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(2 * sizeof(float)));
+    glVertexAttribPointer(indice_cor, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
 
     glm::mat4 visualizacao = glm::lookAt(
            glm::vec3(1.2f, 1.2f, 1.2f),
@@ -141,11 +173,8 @@ void ComponenteOpenGL::paintGL()
     GLint transformacao_uniforme = glGetUniformLocation(programa_shader, "transformacao");
     glUniformMatrix4fv(transformacao_uniforme, 1, GL_FALSE, glm::value_ptr(transformacao));
 
-    glm::mat4 projecao = glm::perspective(glm::radians(45.0f + sin(time) * 15.0f), 800.0f / 600.0f, 1.0f, 10.0f);
-    GLint indice_projecao = glGetUniformLocation(programa_shader, "projecao");
-    glUniformMatrix4fv(indice_projecao, 1, GL_FALSE, glm::value_ptr(projecao));
-
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    /* glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); */
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 
     update();
 
