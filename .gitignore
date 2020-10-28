@@ -1,3 +1,4 @@
 .qmake*
 projeto_qt
 *.o
+moc*
