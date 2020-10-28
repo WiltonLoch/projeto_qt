@@ -5,7 +5,11 @@ CONFIG += debug
 
 QT += widgets
 
-HEADERS += ComponenteOpenGL.h
+HEADERS += Membro.h \
+            Corpo.h \
+            ComponenteOpenGL.h
 
-SOURCES += ComponenteOpenGL.cpp \
+SOURCES += Membro.cpp \
+            Corpo.cpp \
+            ComponenteOpenGL.cpp \
             main.cpp

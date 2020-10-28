@@ -5,6 +5,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "ComponenteOpenGL.h"
 
+#define MAX_CUBOS 10
+
 using namespace std;
 
 ComponenteOpenGL::ComponenteOpenGL(QWidget *pai) : QOpenGLWidget(pai){
@@ -21,67 +23,26 @@ void ComponenteOpenGL::initializeGL()
 {
     initializeOpenGLFunctions();
 
-    GLfloat vertices[] = {
-        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
+    vertices.reserve(8 * 10);
+    vertices.reserve(6 * 2 * 10);
 
-        -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
+    glEnable(GL_DEPTH_TEST);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        -0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
-
-         0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
-
-        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
-
-        -0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f
-};
-
-    GLuint ordem[]{
-        0, 1, 2,
-        2, 3, 0
-    };
-
-    t_inicial = std::chrono::high_resolution_clock::now();
+    t_inicial = t_anterior = std::chrono::high_resolution_clock::now();
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
 
     glGenBuffers(1, &ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ordem), ordem, GL_DYNAMIC_DRAW);
+
+    corpo = new Corpo();
+    corpo->adicionarMembro(glm::vec3(0.0f, 0.0f, 0.0f), 0.2f, 0.5f, "braco");
+    corpo->adicionarMembro(glm::vec3(0.0f, 0.0f, 0.5f), 0.2f, 0.5f, "antebraco", "braco");
 
     const char *codigo_vertex_shader = R"glsl(
         #version 130
@@ -147,8 +108,8 @@ void ComponenteOpenGL::initializeGL()
     glVertexAttribPointer(indice_cor, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
 
     glm::mat4 visualizacao = glm::lookAt(
-           glm::vec3(1.2f, 1.2f, 1.2f),
-           glm::vec3(0.0f, 0.0f, 0.0f),
+           glm::vec3(1.2f, 1.0f, 1.3f),
+           glm::vec3(0.0f, 0.0f, 0.5f),
            glm::vec3(0.0f, 0.0f, 1.0f)
     );
     GLint indice_visualizacao = glGetUniformLocation(programa_shader, "visualizacao");
@@ -163,18 +124,22 @@ void ComponenteOpenGL::initializeGL()
 
 void ComponenteOpenGL::paintGL()
 {
-    /* glDrawArrays(GL_TRIANGLES, 0, 3); */
-    float time = std::chrono::duration_cast<std::chrono::duration<float>>(std::chrono::high_resolution_clock::now() - t_inicial).count();
+    auto t_atual = std::chrono::high_resolution_clock::now();
+    float tempo_decorrido = std::chrono::duration_cast<std::chrono::duration<float>>(t_atual - t_inicial).count();
+    /* float derivada_tempo = std::chrono::duration_cast<std::chrono::duration<float>>(t_atual - t_anterior).count(); */
+    /* t_anterior = t_atual; */
 
     makeCurrent();
 
     glm::mat4 transformacao = glm::mat4(1.0f);
-    transformacao = glm::rotate(transformacao, time/5 * glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    transformacao = glm::rotate(transformacao, tempo_decorrido/5 * glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     GLint transformacao_uniforme = glGetUniformLocation(programa_shader, "transformacao");
     glUniformMatrix4fv(transformacao_uniforme, 1, GL_FALSE, glm::value_ptr(transformacao));
 
-    /* glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); */
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    /* corpo->rotacionarMembro(sin(glm::radians(tempo_decorrido * 90)) * 90 * derivada_tempo, "braco"); */
+    /* corpo->rotacionarMembro(sin(glm::radians(tempo_decorrido * 90)) * 90 * derivada_tempo, "antebraco"); */
+
+    glDrawElements(GL_TRIANGLES, corpo->getQtdDesenhoVertices(), GL_UNSIGNED_INT, 0);
 
     update();
 
@@ -182,11 +147,4 @@ void ComponenteOpenGL::paintGL()
 
 void ComponenteOpenGL::resizeGL(int w, int h)
 {
-    /* glViewport(0,0,w,h); */
-    /* glMatrixMode(GL_PROJECTION); */
-    /* /1* glLoadIdentity(); *1/ */
-    /* /1* gluPerspective(45, (float)w/h, 0.01, 100.0); *1/ */
-    /* glMatrixMode(GL_MODELVIEW); */
-    /* glLoadIdentity(); */
-    /* /1* gluLookAt(0,0,5,0,0,0,0,1,0); *1/ */
 }

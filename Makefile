@@ -52,9 +52,13 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = ComponenteOpenGL.cpp \
+SOURCES       = Membro.cpp \
+		Corpo.cpp \
+		ComponenteOpenGL.cpp \
 		main.cpp moc_ComponenteOpenGL.cpp
-OBJECTS       = ComponenteOpenGL.o \
+OBJECTS       = Membro.o \
+		Corpo.o \
+		ComponenteOpenGL.o \
 		main.o \
 		moc_ComponenteOpenGL.o
 DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
@@ -322,7 +326,11 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/features/exceptions.prf \
 		/usr/lib/qt/mkspecs/features/yacc.prf \
 		/usr/lib/qt/mkspecs/features/lex.prf \
-		projeto_qt.pro ComponenteOpenGL.h ComponenteOpenGL.cpp \
+		projeto_qt.pro Membro.h \
+		Corpo.h \
+		ComponenteOpenGL.h Membro.cpp \
+		Corpo.cpp \
+		ComponenteOpenGL.cpp \
 		main.cpp
 QMAKE_TARGET  = projeto_qt
 DESTDIR       = 
@@ -883,8 +891,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ComponenteOpenGL.h $(DISTDIR)/
-	$(COPY_FILE) --parents ComponenteOpenGL.cpp main.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents Membro.h Corpo.h ComponenteOpenGL.h $(DISTDIR)/
+	$(COPY_FILE) --parents Membro.cpp Corpo.cpp ComponenteOpenGL.cpp main.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -939,6 +947,13 @@ compiler_lex_clean:
 compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean 
 
 ####### Compile
+
+Membro.o: Membro.cpp Membro.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Membro.o Membro.cpp
+
+Corpo.o: Corpo.cpp Corpo.h \
+		Membro.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Corpo.o Corpo.cpp
 
 ComponenteOpenGL.o: ComponenteOpenGL.cpp ComponenteOpenGL.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ComponenteOpenGL.o ComponenteOpenGL.cpp
