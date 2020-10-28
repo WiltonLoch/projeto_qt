@@ -943,7 +943,7 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 ComponenteOpenGL.o: ComponenteOpenGL.cpp ComponenteOpenGL.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ComponenteOpenGL.o ComponenteOpenGL.cpp
 
-main.o: main.cpp 
+main.o: main.cpp ComponenteOpenGL.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 moc_ComponenteOpenGL.o: moc_ComponenteOpenGL.cpp 

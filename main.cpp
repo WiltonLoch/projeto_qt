@@ -16,7 +16,7 @@ int main(int argc, char * argv[]){
 
     ComponenteOpenGL *componenteGL = new ComponenteOpenGL(&janela);
     componenteGL->move(BORDA, BORDA);
-    componenteGL->resize(janela.width() * 3/4, janela.height() - 2 * BORDA);
+    componenteGL->resize(janela.width() * 3/5, janela.height() - 2 * BORDA);
     
     componenteGL->show();
     return aplicacao.exec();
