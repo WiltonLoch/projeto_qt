@@ -7,6 +7,7 @@
 #define BORDA 10
 
 int main(int argc, char * argv[]){
+    /* aplicacao do QT e janela */
     QApplication aplicacao(argc, argv);
     QWidget janela;
     janela.resize(JANELA_LARGURA, JANELA_ALTURA);
@@ -14,6 +15,7 @@ int main(int argc, char * argv[]){
 
     janela.show();
 
+    /* classe herdada do QOpenGLWidget */
     ComponenteOpenGL *componenteGL = new ComponenteOpenGL(&janela);
     componenteGL->move(BORDA, BORDA);
     int alturaGL = janela.height() - 2 * BORDA;

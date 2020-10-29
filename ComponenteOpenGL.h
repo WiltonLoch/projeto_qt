@@ -24,9 +24,6 @@ class ComponenteOpenGL : public QOpenGLWidget, protected QOpenGLFunctions_3_0{
         std::chrono::high_resolution_clock::time_point t_inicial;
         std::chrono::high_resolution_clock::time_point t_anterior;
 
-        std::vector<GLfloat> vertices;
-        std::vector<GLuint> ordem;
-
         GLuint vbo;
         GLuint vao;
         GLuint ebo;
