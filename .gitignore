@@ -2,3 +2,4 @@
 projeto_qt
 *.o
 moc*
+Makefile
